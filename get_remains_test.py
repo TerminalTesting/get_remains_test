@@ -75,6 +75,9 @@ class GetRemainsTest(unittest.TestCase):
         response = client.service.GetRemainderProducts(parameters)
         for item in response.Members:
 
+            if item.ShopCode[:3] == '021':
+                continue
+
             #проверяем есть ли магазин в БД сайта, если есть берем значение поля db_sort_field
             store_shop = self.session.query(Shops.db_sort_field).filter(Shops.scode == item.ShopCode[:3]).first()
             if store_shop != None:
