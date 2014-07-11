@@ -41,7 +41,7 @@ class GetRemainsTest(unittest.TestCase):
         self.driver.find_element_by_id('password').send_keys(os.getenv('AUTHPASS'))
         self.driver.find_element_by_class_name('btn-primary').click()
         
-        self.driver.get('%sterminal/maintenance/5' % self.HOST)
+        self.driver.get('%sterminal/maintenance/5' % self.SITE)
         status = self.driver.find_elements_by_tag_name('div')[1]
         self.driver.get_screenshot_as_file('maintenance_result.png')
         if '2' not in status.text:
