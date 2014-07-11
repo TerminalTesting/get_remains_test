@@ -75,7 +75,8 @@ class GetRemainsTest(unittest.TestCase):
         response = client.service.GetRemainderProducts(parameters)
         for item in response.Members:
 
-            if item.ShopCode[:3] == '021':
+            if item.ShopCode[:3] in ('021', 'B19', '067', '034', '035',
+                                     '036', '037', '038', '039'):
                 continue
 
             #проверяем есть ли магазин в БД сайта, если есть берем значение поля db_sort_field
@@ -84,8 +85,7 @@ class GetRemainsTest(unittest.TestCase):
                 store_shop = store_shop[0]
             else:
                 cnt += 1
-                print 'Нужный магазин не найден в БД'
-                print 'Код магазина в 1С - ', item.ShopCode[:3]
+                print 'Нужный магазин не найден в БД\nКод магазина в 1С - ', item.ShopCode[:3]
                 print '*'*80
                 continue
 
@@ -95,8 +95,7 @@ class GetRemainsTest(unittest.TestCase):
                 goods_id = goods_id[0]
             else:
                 cnt += 1
-                print 'Нужный товар не найден в БД'
-                print 'Код товара в 1С - ', item.Code
+                print 'Нужный товар не найден в БД\nКод товара в 1С - ', item.Code
                 print '*'*80
                 continue
 
@@ -106,10 +105,8 @@ class GetRemainsTest(unittest.TestCase):
             #сравниваем с данными из 1С
             if query_result != item.Quantity:
                 cnt += 1
-                print 'Ошибка в количестве товара:'
-                print 'Код товара в 1С - ', item.Code
-                print 'Количество с вебсервиса - ', int(item.Quantity)
-                print 'Количество из базы сайта - ', query_result
+                print 'Ошибка в количестве товара:\nКод товара в 1С - ', item.Code
+                print 'Количество с вебсервиса - ', int(item.Quantity), 'Количество из базы сайта - ', query_result
                 print '*'*80
 
                 
