@@ -104,6 +104,7 @@ class GetRemainsTest(unittest.TestCase):
             if query_result != item.Quantity:
                 cnt += 1
                 print 'Ошибка в количестве товара:'
+                print 'Код товара в 1С - ', item.Code
                 print 'Количество с вебсервиса - ', int(item.Quantity)
                 print 'Количество из базы сайта - ', query_result
                 print '*'*80
