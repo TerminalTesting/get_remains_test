@@ -32,51 +32,14 @@ class GetRemainsTest(unittest.TestCase):
         if sys.exc_info()[0]:   
             print sys.exc_info()[0]
 
-    def test_get_remains(self):
-        """ Выполняет процедуру из браузера и парсит страницу на наличие ответа """
-        correct = True # Test status: True - runs well, False - an error occurred
-        self.driver.get('%slogin' % self.SITE)
+    def check_remains(self, members):
+        """ Проверяет остатки и возвращает количество ошибок """
+        errors = 0
         
-        self.driver.find_element_by_id('username').send_keys(os.getenv('AUTH'))
-        self.driver.find_element_by_id('password').send_keys(os.getenv('AUTHPASS'))
-        self.driver.find_element_by_class_name('btn-primary').click()
-        
-        self.driver.get('%sterminal/maintenance/5' % self.SITE)
-        status = self.driver.find_elements_by_tag_name('div')[1]
-        self.driver.get_screenshot_as_file('maintenance_result.png')
-        if '2' not in status.text:
-            correct = False
-            print 'Процедура завершилось с ошибкой, подробности можно посмотреть на скриншоте'
-            print status.text
-            assert correct, (u'Maintenance was finished with error')
-        self.driver.get('%slogout/' % self.SITE)
-        self.driver.close()
-
-        cnt = 0 #счетчик ошибок процедуры
-        wsdl_url = self.WSDL
-        client = Client(wsdl_url) #подключаемся к вебсервису
-
-        #создаем новый тип для общения с вебсервисом
-        parameters = client.factory.create('ns1:ParameterRemainderProducts')
-        """(ParameterRemainderProducts){
-               AllShops = None
-               FilterByShops[] = <empty>
-               AllProducts = None
-               FilterByProducts[] = <empty>
-               FilterByProductsCode[] = <empty>
-             }"""
-        #задаем свойства объекта, выступают в роли параметров
-        parameters.AllShops = True
-        parameters.FilterByShops = ''
-        parameters.AllProducts = True
-        parameters.FilterByProducts = ''
-        parameters.FilterByProductsCode = ''
-        
-        response = client.service.GetRemainderProducts(parameters)
-        for item in response.Members:
+        for item in members:
 
             if item.ShopCode[:3] in ('021', 'B19', '067', '034', '035',
-                                     '036', '037', '038', '039'):
+                                     '036', '037', '038', '039', '006'):
                 continue
 
             #проверяем есть ли магазин в БД сайта, если есть берем значение поля db_sort_field
@@ -113,5 +76,51 @@ class GetRemainsTest(unittest.TestCase):
                 print 'Количество из базы сайта - ', query_result
                 print '*'*80
 
+        return errors
+
+        
+
+    def test_get_remains(self):
+        """ Выполняет процедуру из браузера и парсит страницу на наличие ответа """
+        correct = True # Test status: True - runs well, False - an error occurred
+        self.driver.get('%slogin' % self.SITE)
+        
+        self.driver.find_element_by_id('username').send_keys(os.getenv('AUTH'))
+        self.driver.find_element_by_id('password').send_keys(os.getenv('AUTHPASS'))
+        self.driver.find_element_by_class_name('btn-primary').click()
+        
+        self.driver.get('%sterminal/maintenance/5' % self.SITE)
+        status = self.driver.find_elements_by_tag_name('div')[1]
+        self.driver.get_screenshot_as_file('maintenance_result.png')
+        if '2' not in status.text:
+            correct = False
+            print 'Процедура завершилось с ошибкой, подробности можно посмотреть на скриншоте'
+            print status.text
+            assert correct, (u'Maintenance was finished with error')
+        self.driver.get('%slogout/' % self.SITE)
+        self.driver.close()
+
+        wsdl_url = self.WSDL
+        client = Client(wsdl_url) #подключаемся к вебсервису
+
+        #создаем новый тип для общения с вебсервисом
+        parameters = client.factory.create('ns1:ParameterRemainderProducts')
+        """(ParameterRemainderProducts){
+               AllShops = None
+               FilterByShops[] = <empty>
+               AllProducts = None
+               FilterByProducts[] = <empty>
+               FilterByProductsCode[] = <empty>
+             }"""
+        #задаем свойства объекта, выступают в роли параметров
+        parameters.AllShops = True
+        parameters.FilterByShops = ''
+        parameters.AllProducts = True
+        parameters.FilterByProducts = ''
+        parameters.FilterByProductsCode = ''
+        
+        response = client.service.GetRemainderProducts(parameters)
+        
+        cnt = check_remains(response.Members)
                 
         assert cnt==0, (u'Errors found: %d')%(cnt)
