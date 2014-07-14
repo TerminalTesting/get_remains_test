@@ -34,7 +34,7 @@ class GetRemainsTest(unittest.TestCase):
 
     def check_remains(self, members):
         """ Проверяет остатки и возвращает количество ошибок """
-        errors = 0
+        cnt = 0
         
         for item in members:
 
@@ -76,7 +76,7 @@ class GetRemainsTest(unittest.TestCase):
                 print 'Количество из базы сайта - ', query_result
                 print '*'*80
 
-        return errors
+        return cnt
 
         
 
@@ -121,6 +121,6 @@ class GetRemainsTest(unittest.TestCase):
         
         response = client.service.GetRemainderProducts(parameters)
         
-        cnt = check_remains(response.Members)
+        errors = check_remains(response.Members)
                 
-        assert cnt==0, (u'Errors found: %d')%(cnt)
+        assert errors == 0, (u'Errors found: %d')%(errors)
