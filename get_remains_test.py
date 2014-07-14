@@ -121,6 +121,6 @@ class GetRemainsTest(unittest.TestCase):
         
         response = client.service.GetRemainderProducts(parameters)
         
-        errors = check_remains(response.Members)
+        errors = self.check_remains(response.Members)
                 
         assert errors == 0, (u'Errors found: %d')%(errors)
